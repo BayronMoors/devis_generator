@@ -1,66 +1,108 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type Props = {};
 
-
-export default function Calendar({ }: Props) {
+function Calendar({}: Props) {
   const [date, setDate] = useState<Date>(new Date());
 
-  const listOfDays: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-  const listOfMonths: string[] = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
-  const [year, setYear] = useState<number>(0);
-  const [month, setMonth] = useState<number>(0);
-  const [nameMonth, setNameMonth] = useState<string>('');
-  const [day, setDay] = useState<number>(0);
-  const [numberOfDaysInCurrentMonth, setNumberOfDaysInCurrentMonth] = useState<number>(0);
-  const [listOfPreivousMonthDay, setListOfPreivousMonthDay] = useState<number[]>([]);
+  const listOfDays: string[] = [
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+    "dimanche",
+  ];
+  const listOfMonths: string[] = [
+    "janvier",
+    "fevrier",
+    "mars",
+    "avril",
+    "mai",
+    "juin",
+    "juillet",
+    "aout",
+    "septembre",
+    "octobre",
+    "novembre",
+    "decembre",
+  ];
+  const [year, setYear] = useState<number>(date.getFullYear());
+  const [month, setMonth] = useState<number>(date.getMonth());
+  const [nameMonth, setNameMonth] = useState<string>(
+    date.toLocaleDateString("fr", { month: "long" })
+  );
+  const [day, setDay] = useState<number>(date.getDate());
+  const [numberOfDaysInCurrentMonth, setNumberOfDaysInCurrentMonth] = useState<
+    number[]
+  >([]);
+  const [listOfPreivousMonthDay, setListOfPreivousMonthDay] = useState<
+    number[]
+  >([]);
 
   const getDaysInMonth = (year: number, month: number): number => {
     return new Date(year, month, 0).getDate();
   };
 
   const getNameOfDay = (year: number, month: number, day: number): string => {
-    return new Date(`${(month + 1).toString()} ${day.toString()} ${year.toString()}`).toLocaleDateString("fr", {
+    return new Date(
+      `${month.toString()} ${day.toString()} ${year.toString()}`
+    ).toLocaleDateString("fr", {
       weekday: "long",
     });
   };
 
-  const setNumberOfdaysInCurrentMonth = (): void => {
-    setNumberOfDaysInCurrentMonth(getDaysInMonth(year, month));
-  }
+  const initNumberOfdaysInCurrentMonth = (): void => {
+    const numberDays = getDaysInMonth(year, month + 1);
+    const stockDays: number[] = [];
+    for (let i = 0; i < numberDays; i++) {
+      stockDays.push(i + 1);
+    }
+    setNumberOfDaysInCurrentMonth(stockDays);
+  };
 
   const calculatesNumberOfDay = (): void => {
-    const numberDay = getDaysInMonth(month === 0 ? year - 1 : year, month === 0 ? 12 : month);
-    const indexDay = listOfDays.indexOf(getNameOfDay(year, month, 1));
+    const numberDay = getDaysInMonth(
+      month === 0 ? year - 1 : year,
+      month === 0 ? 12 : month
+    );
+    const indexDay = listOfDays.indexOf(getNameOfDay(year, month + 1, 1));
     const days: number[] = [];
-    for (let i = numberDay; i > numberDay - (indexDay + 1); i--) {
+    for (let i = numberDay; i > numberDay - indexDay; i--) {
       days.push(i);
     }
     setListOfPreivousMonthDay(days);
-  }
+  };
 
   const initDate = (): void => {
     setYear(date.getFullYear());
     setMonth(date.getMonth());
-    setNameMonth(date.toLocaleDateString('fr', { month: "long" }));
+    setNameMonth(date.toLocaleDateString("fr", { month: "long" }));
     setDay(date.getDate());
-  }
-
+  };
 
   useEffect(() => {
     initDate();
-    setNumberOfdaysInCurrentMonth();
+  }, [date]);
+
+  useEffect(() => {
     calculatesNumberOfDay();
-  }, [date])
-
-
-  const test = () => {
-    // calculatesNumberOfDay()
-    setDate(new Date('3 17 2023'));
+    initNumberOfdaysInCurrentMonth();
     console.log(listOfPreivousMonthDay);
+  }, [month, year]);
 
+  const handleClickNextMonth = (): void => {
+    const newMonth = month + 1 === 12 ? 1 : month + 2;
+    const newYear = month + 1 === 12 ? year + 1 : year;
+    setDate(new Date(`${newMonth} 1 ${newYear}`));
   };
 
+  const handleClickPreviousMonth = (): void => {
+    const newMonth = month - 1 === -1 ? 12 : month;
+    const newYear = month - 1 === -1 ? year - 1 : year;
+    setDate(new Date(`${newMonth} 1 ${newYear}`));
+  };
 
   return (
     <div className="mb-4">
@@ -69,11 +111,16 @@ export default function Calendar({ }: Props) {
           <div className="w-full rounded shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xl font-bold text-left text-black dark:text-white">
-                <span className="mr-2 cursor-pointer">{nameMonth}</span>
+                <span className="mr-2 cursor-pointer">
+                  {nameMonth.charAt(0).toUpperCase() + nameMonth.slice(1)}
+                </span>
                 <span className="cursor-pointer">{year}</span>
               </div>
               <div className="flex space-x-4">
-                <button className="p-2 text-white bg-blue-500 rounded-full">
+                <button
+                  className="p-2 text-white bg-blue-500 rounded-full"
+                  onClick={handleClickPreviousMonth}
+                >
                   <svg
                     width="15"
                     height="15"
@@ -88,7 +135,7 @@ export default function Calendar({ }: Props) {
                 </button>
                 <button
                   className="p-2 text-white bg-blue-500 rounded-full"
-                  onClick={test}
+                  onClick={handleClickNextMonth}
                 >
                   <svg
                     width="15"
@@ -105,153 +152,59 @@ export default function Calendar({ }: Props) {
               </div>
             </div>
             <div className="-mx-2">
-              <table className="w-full dark:text-white">
-                <tr>
-                  <th className="px-2 py-3 md:px-3 ">S</th>
-                  <th className="px-2 py-3 md:px-3 ">M</th>
-                  <th className="px-2 py-3 md:px-3 ">T</th>
-                  <th className="px-2 py-3 md:px-3 ">W</th>
-                  <th className="px-2 py-3 md:px-3 ">T</th>
-                  <th className="px-2 py-3 md:px-3 ">F</th>
-                  <th className="px-2 py-3 md:px-3 ">S</th>
-                </tr>
-                <tr className="text-gray-400 dark:text-gray-500">
-                  {listOfPreivousMonthDay.length && listOfPreivousMonthDay.sort((a: number, b: number) => a - b).map((day: number) => (
-                    <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                      {day}
-                    </td>
-                  ))}
-                  {/* <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    25
-                  </td> */}
-                  {/* <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    26
-                  </td>
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    27
-                  </td>
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    28
-                  </td>
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    29
-                  </td>
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
-                    30
-                  </td> */}
-                  <td className="px-2 py-3 text-center text-gray-800 cursor-pointer md:px-3 hover:text-blue-500">
-                    1
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    2
-                  </td>
-                  <td className="relative px-1 py-3 text-center cursor-pointer hover:text-blue-500">
-                    3
-                    <span className="absolute bottom-0 w-2 h-2 transform -translate-x-1/2 bg-blue-500 rounded-full left-1/2"></span>
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    4
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    5
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    6
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    7
-                  </td>
-                  <td className="relative px-2 py-3 text-center cursor-pointer md:px-3 lg:px-3 hover:text-blue-500">
-                    8
-                    <span className="absolute bottom-0 w-2 h-2 transform -translate-x-1/2 bg-yellow-500 rounded-full left-1/2"></span>
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    9
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    10
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    11
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    12
-                  </td>
-                  <td className="px-2 py-3 text-center text-white cursor-pointer md:px-3">
-                    <span className="p-2 bg-blue-500 rounded-full">13</span>
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    14
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    15
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    16
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    17
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    18
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    19
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    20
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    21
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    22
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    23
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    24
-                  </td>
-                  <td className="relative px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    25
-                    <span className="absolute bottom-0 w-2 h-2 transform -translate-x-1/2 bg-red-500 rounded-full left-1/2"></span>
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    26
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    27
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    28
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    29
-                  </td>
-                </tr>
-                <tr>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    30
-                  </td>
-                  <td className="px-2 py-3 text-center cursor-pointer md:px-3 hover:text-blue-500">
-                    31
-                  </td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </table>
+              <div className="w-ful grid grid-cols-7 p-4 dark:text-white">
+                {/* days name */}
+                <span className="px-2 py-3 font-bold  text-center">L</span>
+                <span className="px-2 py-3 font-bold  text-center">M</span>
+                <span className="px-2 py-3 font-bold  text-center">M</span>
+                <span className="px-2 py-3 font-bold  text-center">J</span>
+                <span className="px-2 py-3 font-bold  text-center">V</span>
+                <span className="px-2 py-3 font-bold  text-center">S</span>
+                <span className="px-2 py-3 font-bold  text-center">D</span>
+
+                {/* day of last month */}
+                {listOfPreivousMonthDay.length > 0 &&
+                  listOfPreivousMonthDay
+                    .sort((a: number, b: number) => a - b)
+                    .map((dayOfPreviousMonth: number) => (
+                      <span
+                        className="px-2 py-3 text-center text-gray-300  dark:text-gray-500"
+                        key={dayOfPreviousMonth}
+                      >
+                        {dayOfPreviousMonth}
+                      </span>
+                    ))}
+                {numberOfDaysInCurrentMonth.length &&
+                  numberOfDaysInCurrentMonth.map(
+                    (dayOfCurrentMonth: number) => {
+                      if (dayOfCurrentMonth === day) {
+                        return (
+                          <span className="px-2 py-3 text-center text-white cursor-pointer ">
+                            <span className="p-2 bg-blue-500 rounded-full">
+                              {dayOfCurrentMonth}
+                            </span>
+                          </span>
+                        );
+                      } else {
+                        return (
+                          <span className="px-2 py-3 text-center cursor-pointer  hover:text-blue-500">
+                            {dayOfCurrentMonth}
+                          </span>
+                        );
+                      }
+                    }
+                  )}
+                {/* <span className="px-2 py-3 text-center cursor-pointer  hover:text-blue-500">
+                  1
+                </span>
+                <span className="relative px-1 py-3 text-center cursor-pointer hover:text-blue-500">
+                  5
+                  <span className="absolute bottom-0 w-2 h-2 transform -translate-x-1/2 bg-blue-500 rounded-full left-1/2"></span>
+                </span>
+                <span className="px-2 py-3 text-center text-white cursor-pointer ">
+                  <span className="p-2 bg-blue-500 rounded-full">13</span>
+                </span> */}
+              </div>
             </div>
           </div>
         </div>
@@ -259,3 +212,5 @@ export default function Calendar({ }: Props) {
     </div>
   );
 }
+
+export default React.memo(Calendar);
