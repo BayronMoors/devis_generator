@@ -189,7 +189,7 @@ function Calendar({}: Props) {
                         );
                       } else {
                         return (
-                          <span className="px-2 py-3 text-center cursor-pointer  hover:text-blue-500">
+                          <span onClick={() => setDay(dayOfCurrentMonth)} className="px-2 py-3 text-center cursor-pointer  hover:text-blue-500">
                             {dayOfCurrentMonth}
                           </span>
                         );
