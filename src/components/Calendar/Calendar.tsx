@@ -1,23 +1,67 @@
+import { useEffect, useState } from "react";
+
 type Props = {};
 
-const getDaysInMonth = (year: number, month: number): number => {
-  return new Date(year, month, 0).getDate();
-};
 
-const getNameOfDay = (year: string, month: string, day: string) => {
-  return new Date(`${month} ${day} ${year}`).toLocaleDateString("fr", {
-    weekday: "long",
-  });
-};
+export default function Calendar({ }: Props) {
+  const [date, setDate] = useState<Date>(new Date());
 
-const date = new Date("11 12 2011");
+  const listOfDays: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+  const listOfMonths: string[] = ['janvier', 'fevrier', 'mars', 'avril', 'mai', 'juin', 'juillet', 'aout', 'septembre', 'octobre', 'novembre', 'decembre'];
+  const [year, setYear] = useState<number>(0);
+  const [month, setMonth] = useState<number>(0);
+  const [nameMonth, setNameMonth] = useState<string>('');
+  const [day, setDay] = useState<number>(0);
+  const [numberOfDaysInCurrentMonth, setNumberOfDaysInCurrentMonth] = useState<number>(0);
+  const [listOfPreivousMonthDay, setListOfPreivousMonthDay] = useState<number[]>([]);
 
-const test = () => {
-  console.log(getDaysInMonth(24, 2));
-  console.log(getNameOfDay("2024", "2", "29"));
-};
+  const getDaysInMonth = (year: number, month: number): number => {
+    return new Date(year, month, 0).getDate();
+  };
 
-export default function Calendar({}: Props) {
+  const getNameOfDay = (year: number, month: number, day: number): string => {
+    return new Date(`${(month + 1).toString()} ${day.toString()} ${year.toString()}`).toLocaleDateString("fr", {
+      weekday: "long",
+    });
+  };
+
+  const setNumberOfdaysInCurrentMonth = (): void => {
+    setNumberOfDaysInCurrentMonth(getDaysInMonth(year, month));
+  }
+
+  const calculatesNumberOfDay = (): void => {
+    const numberDay = getDaysInMonth(month === 0 ? year - 1 : year, month === 0 ? 12 : month);
+    const indexDay = listOfDays.indexOf(getNameOfDay(year, month, 1));
+    const days: number[] = [];
+    for (let i = numberDay; i > numberDay - (indexDay + 1); i--) {
+      days.push(i);
+    }
+    setListOfPreivousMonthDay(days);
+  }
+
+  const initDate = (): void => {
+    setYear(date.getFullYear());
+    setMonth(date.getMonth());
+    setNameMonth(date.toLocaleDateString('fr', { month: "long" }));
+    setDay(date.getDate());
+  }
+
+
+  useEffect(() => {
+    initDate();
+    setNumberOfdaysInCurrentMonth();
+    calculatesNumberOfDay();
+  }, [date])
+
+
+  const test = () => {
+    // calculatesNumberOfDay()
+    setDate(new Date('3 17 2023'));
+    console.log(listOfPreivousMonthDay);
+
+  };
+
+
   return (
     <div className="mb-4">
       <div className="p-4 bg-white shadow-lg rounded-2xl dark:bg-gray-700">
@@ -25,7 +69,8 @@ export default function Calendar({}: Props) {
           <div className="w-full rounded shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="text-xl font-bold text-left text-black dark:text-white">
-                Dec 2021
+                <span className="mr-2 cursor-pointer">{nameMonth}</span>
+                <span className="cursor-pointer">{year}</span>
               </div>
               <div className="flex space-x-4">
                 <button className="p-2 text-white bg-blue-500 rounded-full">
@@ -71,10 +116,15 @@ export default function Calendar({}: Props) {
                   <th className="px-2 py-3 md:px-3 ">S</th>
                 </tr>
                 <tr className="text-gray-400 dark:text-gray-500">
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
+                  {listOfPreivousMonthDay.length && listOfPreivousMonthDay.sort((a: number, b: number) => a - b).map((day: number) => (
+                    <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
+                      {day}
+                    </td>
+                  ))}
+                  {/* <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
                     25
-                  </td>
-                  <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
+                  </td> */}
+                  {/* <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
                     26
                   </td>
                   <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
@@ -88,7 +138,7 @@ export default function Calendar({}: Props) {
                   </td>
                   <td className="px-2 py-3 text-center text-gray-300 md:px-3 dark:text-gray-500">
                     30
-                  </td>
+                  </td> */}
                   <td className="px-2 py-3 text-center text-gray-800 cursor-pointer md:px-3 hover:text-blue-500">
                     1
                   </td>
