@@ -107,8 +107,8 @@ function Calendar({}: Props) {
   };
 
   return (
-    <div className="mb-4">
-      <div className="p-4 bg-white shadow-lg rounded-2xl dark:bg-gray-700">
+    <div className="mb-2 ">
+      <div className="p-4 h-[420px] bg-white shadow-lg rounded-2xl dark:bg-gray-700">
         <div className="flex flex-wrap overflow-hidden">
           <div className="w-full rounded shadow-sm">
             <div className="flex items-center justify-between mb-4">
