@@ -82,9 +82,11 @@ function Calendar({}: Props) {
     setDay(date.getDate());
   };
 
+  //intitialization of all date when we change date
   useEffect(() => {
     initDate();
   }, [date]);
+
 
   useEffect(() => {
     calculatesNumberOfDay();
