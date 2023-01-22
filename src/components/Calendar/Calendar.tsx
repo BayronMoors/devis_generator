@@ -14,20 +14,7 @@ function Calendar({}: Props) {
     "samedi",
     "dimanche",
   ];
-  const listOfMonths: string[] = [
-    "janvier",
-    "fevrier",
-    "mars",
-    "avril",
-    "mai",
-    "juin",
-    "juillet",
-    "aout",
-    "septembre",
-    "octobre",
-    "novembre",
-    "decembre",
-  ];
+  
   const [year, setYear] = useState<number>(date.getFullYear());
   const [month, setMonth] = useState<number>(date.getMonth());
   const [nameMonth, setNameMonth] = useState<string>(
@@ -91,7 +78,6 @@ function Calendar({}: Props) {
   useEffect(() => {
     calculatesNumberOfDay();
     initNumberOfdaysInCurrentMonth();
-    console.log(listOfPreivousMonthDay);
   }, [month, year]);
 
   const handleClickNextMonth = (): void => {

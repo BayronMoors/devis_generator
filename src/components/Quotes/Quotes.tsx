@@ -2,7 +2,7 @@ type Props = {}
 
 export default function Quotes({}: Props) {
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 w-full  sm:pr-4 sm:w-1/2 xl:w-2/3 mb-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
     <div className="">
       <div className="w-full h-full p-4 bg-white shadow-lg rounded-2xl dark:bg-gray-700">
         <div className="flex items-center justify-between mb-6">
