@@ -22,4 +22,18 @@ export class App {
     public static getApp(): FirebaseApp {
         return this.app;
     }
+
+    public static setSessionStorage(jwt: string) {
+        window.sessionStorage.setItem('jwt', JSON.stringify(jwt))
+    }
+
+    public static getSessionStorage(value: string)  {
+        const data = sessionStorage.getItem(value);
+        if(data !== null) JSON.parse(data);
+        else data;
+    }
+
+    public static removeSessionStorage(value: string) {
+        sessionStorage.removeItem(value);
+    }
 }
